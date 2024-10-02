@@ -16,52 +16,100 @@ let cantidadTotal = 0;
 let precioTotal = 0;
 let seguirComprando = false;
 
+
+
+
+
 const comprarProductos = () => {
-do {
-        producto = prompt("Queres comprar pinceles,lapices o ambos?");
-        cantidad = parseInt(prompt("Cuantos queres llevar?"));
-        console.log(isNaN(cantidad));
+    console.log("Bienvenido a la librería artesanal.");
+    console.log("Productos disponibles:");
+    
+    productosLibreriaArtesanal.forEach(producto => {
+        console.log(`${producto.id}: ${producto.nombre} - $${producto.precio.toFixed(2)} (Disponibles: ${producto.cantidadDisponible})`);
+    });}
 
-    while(isNaN(cantidad)) {
-                alert("Debe agragar un numero valido");
-            cantidad = parseInt( prompt("Queres comprar pinceles,lapices o amboss?"));
+    const carrito = [];
 
-            return cantidad;
-    }
-
+productosLibreriaArtesanal.sort((a, b) => a.precio - b.precio);
     
 
-    switch (producto) {
-            case "pinceles":
-                    precio = 1000;
-                break;
-            case "lapices":
-                        precio = 1500;
-                        break;
-            case "ambos":
-                    precio = 2500;
-            
-            default :
+
+function agregarAlCarrito(productoId, cantidad) {
+    const producto = productosLibreriaArtesanal.find(p => p.id === productoId);
+    
+    if (producto) {
+        if (cantidad > producto.cantidadDisponible) {
+            console.log(`No hay suficiente stock de ${producto.nombre}.`);
+        } else {
+            carrito.push({ ...producto, cantidad });
+            console.log(`${cantidad} de ${producto.nombre} agregado(s) al carrito.`);
+            producto.cantidadDisponible -= cantidad; 
+        }
+    } else {
+        console.log("Producto no encontrado.");
+    }
+}
+
+
+agregarAlCarrito(1, 2); 
+agregarAlCarrito(2, 1); 
+agregarAlCarrito(3, 5); 
+
+
+const eliminarDelCarrito = (productoId) => {
+    const indice = carrito.findIndex(item => item.id === productoId);
+    
+    if (indice !== -1) {
+        const productoEliminado = carrito[indice];
+        carrito.splice(indice, 1); 
+        console.log(`${productoEliminado.cantidad} de ${productoEliminado.nombre} eliminado(s) del carrito.`);
         
-                        alert("El producto no se encuentra en el catalago");
-                break;
-            }
-
-            precioTotal += precio * cantidad;
-    cantidadTotal += cantidad;
-
-    seguirComprando = confirm("Desea seguir comprando?");
-        } while (seguirComprando);
-
-            return precioTotal;
-
+        
+        const productoOriginal = productosLibreriaArtesanal.find(p => p.id === productoId);
+        if (productoOriginal) {
+            productoOriginal.cantidadDisponible += productoEliminado.cantidad;
+        }
+    } else {
+        console.log("Producto no encontrado en el carrito.");
     }
+};
 
-    const subTotal = comprarProductos();
-    const precioFinal = aplicarDescuento(subTotal);
+console.log("Carrito de compras:", carrito);
+
+
+const mostrarCarrito = () => {
+    console.log("Carrito de compras:");
+    if (carrito.length === 0) {
+        console.log("El carrito está vacío.");
+        return;
+    }
     
-    console.log(precioFinal);
+    carrito.forEach(item => {
+        console.log(`${item.cantidad} x ${item.nombre} - $${item.precio.toFixed(2)} cada uno`);
+    });
+};
 
 
-    alert("Esta llevando"+cantidadTotal+"productos y el total a pagar es: $"+precioTotal)
-    alert("Gracias por su compra!");
+const calcularTotal = () => {
+    return carrito.reduce((total, item) => total + (item.precio * item.cantidad), 0);
+};
+
+
+const confirmarCompra = () => {
+    mostrarCarrito();
+    const total = calcularTotal();
+    console.log(`Total a pagar: $${total.toFixed(2)}`);
+
+    const confirmacion = prompt("¿Deseas confirmar la compra? (sí/no)").toLowerCase();
+    if (confirmacion === 'sí') {
+        console.log("¡Gracias por tu compra!");
+        
+        carrito = [];
+    } else {
+        console.log("La compra ha sido cancelada.");
+    }
+};
+    
+comprarProductos();
+
+    
