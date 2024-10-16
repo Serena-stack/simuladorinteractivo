@@ -28,11 +28,12 @@ const comprarProductos = () => {
         console.log(`${producto.id}: ${producto.nombre} - $${producto.precio.toFixed(2)} (Disponibles: ${producto.cantidadDisponible})`);
     });}
 
-    const carrito = [];
+    let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
+actualizarCarrito();
+
 
 productosLibreriaArtesanal.sort((a, b) => a.precio - b.precio);
     
-
 
 function agregarAlCarrito(productoId, cantidad) {
     const producto = productosLibreriaArtesanal.find(p => p.id === productoId);
@@ -42,6 +43,8 @@ function agregarAlCarrito(productoId, cantidad) {
             console.log(`No hay suficiente stock de ${producto.nombre}.`);
         } else {
             carrito.push({ ...producto, cantidad });
+            localStorage.setItem('carrito', JSON.stringify(carrito));
+            actualizarCarrito();
             console.log(`${cantidad} de ${producto.nombre} agregado(s) al carrito.`);
             producto.cantidadDisponible -= cantidad; 
         }
@@ -49,6 +52,27 @@ function agregarAlCarrito(productoId, cantidad) {
         console.log("Producto no encontrado.");
     }
 }
+
+function actualizarCarrito() {
+    const listaCarrito = document.getElementById('carrito');
+    carrito.innerHTML = '';
+    let total = 0;
+    carrito.forEach((producto, index) => {
+        const li = document.createElement('li');
+        li.textContent = `${producto.nombre} - $${producto.precio}`;
+        listaCarrito.appendChild(li);
+        total += producto.precio;
+    });
+
+    document.getElementById('total').textContent = `Total: $${total}`;
+
+    document.getElementById('vaciarCarrito').addEventListener('click', () => {
+        carrito = [];
+        localStorage.removeItem('carrito');
+        actualizarCarrito();
+    });
+}
+
 
 
 agregarAlCarrito(1, 2); 
@@ -70,11 +94,11 @@ const eliminarDelCarrito = (productoId) => {
             productoOriginal.cantidadDisponible += productoEliminado.cantidad;
         }
     } else {
-        console.log("Producto no encontrado en el carrito.");
+        alert("Producto no encontrado en el carrito.");
     }
 };
 
-console.log("Carrito de compras:", carrito);
+    alert("Carrito de compras:", carrito);
 
 
 const mostrarCarrito = () => {
@@ -88,7 +112,18 @@ const mostrarCarrito = () => {
         console.log(`${item.cantidad} x ${item.nombre} - $${item.precio.toFixed(2)} cada uno`);
     });
 };
+function mostrarCarrito() {
+    const carrito = document.getElementById('carrito');
+    carrito.innerHTML = ' '
 
+    carrito.forEach((producto, index) => {
+        const li = document.createElement('li');
+        li.textContent = `${producto.nombre} - $${producto.precio}`;
+        carrito.appendChild(li);
+    });
+
+    document.getElementById('total').textContent = `Total: $${total}`;
+}
 
 const calcularTotal = () => {
     return carrito.reduce((total, item) => total + (item.precio * item.cantidad), 0);
@@ -104,9 +139,10 @@ const confirmarCompra = () => {
     if (confirmacion === 'sí') {
         console.log("¡Gracias por tu compra!");
         
-        carrito = [];
+        carrito.length = 0
+
     } else {
-        console.log("La compra ha sido cancelada.");
+        alert("La compra ha sido cancelada.");
     }
 };
     

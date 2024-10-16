@@ -43,4 +43,4 @@ const productosLibreriaArtesanal = [
 ];
 
 
-console.log(productosLibreriaArtesanal);
+
